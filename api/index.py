@@ -3,18 +3,13 @@ import json
 import yt_dlp
 import queue
 import threading
-from flask import Flask, request, jsonify, Response, send_from_directory, send_file
+from flask import Flask, request, jsonify, Response, send_file
 
-app = Flask(__name__, static_folder='.', static_url_path='')
-
-@app.route('/')
-def index():
-    return send_from_directory('.', 'index.html')
+app = Flask(__name__)
 
 @app.route('/api/serve_file/<dl_type>/<filename>')
 def serve_file(dl_type, filename):
-    folder = "Downloads/Video" if dl_type == 'video' else "Downloads/Audio"
-    filepath = os.path.join(folder, filename)
+    filepath = os.path.join("/tmp", filename)
     if os.path.exists(filepath):
         return send_file(filepath, as_attachment=True)
     return "File not found", 404
@@ -65,7 +60,7 @@ def download():
     if not url:
         return jsonify({"error": "No URL provided"}), 400
 
-    download_folder = "Downloads/Video" if dl_type == 'video' else "Downloads/Audio"
+    download_folder = "/tmp"
     os.makedirs(download_folder, exist_ok=True)
 
     def generate():
