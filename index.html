@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Media Intelligence Extraction System | Portfolio OS</title>
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div id="ambient-bg">
+        <div class="aurora aurora-1"></div>
+        <div class="aurora aurora-2"></div>
+        <div class="aurora aurora-3"></div>
+    </div>
+
+    <div class="scanlines"></div>
+
+    <nav class="hud-nav">
+        <div class="sys-info">SYS.VER.4.0.1 // MEDIA.INTEL.EXTRACTOR</div>
+        <div class="nav-links">
+            <button class="nav-btn active" data-target="dashboard">DASHBOARD</button>
+            <button class="nav-btn" data-target="extractor">EXTRACTOR</button>
+            <button class="nav-btn" data-target="architecture">ARCHITECTURE</button>
+            <button class="nav-btn" data-target="story">ORIGIN</button>
+            <button class="nav-btn" id="legacy-btn">LEGACY TERMINAL</button>
+        </div>
+    </nav>
+
+    <main class="container">
+        <!-- Dashboard Section -->
+        <section id="dashboard" class="glass-panel active">
+            <header class="section-header">
+                <h2>MEDIA INTELLIGENCE DASHBOARD</h2>
+                <div class="status-indicator">
+                    <span class="pulse"></span> SYSTEM NOMINAL
+                </div>
+            </header>
+            
+            <div class="dashboard-grid">
+                <!-- System Health -->
+                <div class="hud-box">
+                    <h3>System Health</h3>
+                    <div class="health-stats">
+                        <div class="stat-row"><span>CPU</span> <div class="bar-bg"><div class="bar-fill" style="width: 34%"></div></div></div>
+                        <div class="stat-row"><span>MEM</span> <div class="bar-bg"><div class="bar-fill" style="width: 62%"></div></div></div>
+                        <div class="stat-row"><span>NET</span> <div class="bar-bg"><div class="bar-fill" style="width: 89%"></div></div></div>
+                    </div>
+                </div>
+
+                <!-- Extraction Engine Status -->
+                <div class="hud-box">
+                    <h3>Extraction Engine</h3>
+                    <div class="engine-status">
+                        <div class="status-item"><span class="label">yt-dlp Core</span> <span class="value success">ONLINE</span></div>
+                        <div class="status-item"><span class="label">FFmpeg Processor</span> <span class="value success">ACTIVE</span></div>
+                        <div class="status-item"><span class="label">Bypass Modules</span> <span class="value warning">STANDBY</span></div>
+                    </div>
+                </div>
+
+                <!-- Download Statistics -->
+                <div class="hud-box stat-counter">
+                    <h3>Total Extractions</h3>
+                    <div class="counter-value" id="total-extractions">14,204</div>
+                    <div class="sub-text">+42 in last 24h</div>
+                </div>
+
+                <!-- Supported Platforms -->
+                <div class="hud-box span-2">
+                    <h3>Supported Platforms Grid</h3>
+                    <div class="platform-grid">
+                        <div class="platform-badge">YouTube</div>
+                        <div class="platform-badge">Instagram</div>
+                        <div class="platform-badge">TikTok</div>
+                        <div class="platform-badge">X (Twitter)</div>
+                        <div class="platform-badge">Facebook</div>
+                        <div class="platform-badge">Vimeo</div>
+                        <div class="platform-badge">Twitch</div>
+                        <div class="platform-badge">Reddit</div>
+                        <div class="platform-badge">SoundCloud</div>
+                        <div class="platform-badge">+1000 More</div>
+                    </div>
+                </div>
+
+                <!-- Processing Queue -->
+                <div class="hud-box span-2">
+                    <h3>Processing Queue</h3>
+                    <div class="queue-list">
+                        <div class="queue-item">
+                            <span class="q-id">ID: 0x9A4B</span>
+                            <span class="q-type">VIDEO</span>
+                            <span class="q-status status-processing">EXTRACTING [45%]</span>
+                        </div>
+                        <div class="queue-item">
+                            <span class="q-id">ID: 0x9A4A</span>
+                            <span class="q-type">AUDIO</span>
+                            <span class="q-status status-done">COMPLETED</span>
+                        </div>
+                        <div class="queue-item">
+                            <span class="q-id">ID: 0x9A49</span>
+                            <span class="q-type">VIDEO</span>
+                            <span class="q-status status-done">COMPLETED</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Extractor Section -->
+        <section id="extractor" class="glass-panel">
+            <header class="section-header">
+                <h2>EXTRACTION TERMINUS</h2>
+                <div class="status-indicator">
+                    <span class="pulse"></span> AWAITING INPUT
+                </div>
+            </header>
+
+            <div class="extractor-interface">
+                <div class="input-group">
+                    <div class="input-glitch-container">
+                        <input type="text" id="url-input" placeholder="INITIALIZE TARGET URL..." autocomplete="off">
+                        <div class="input-border"></div>
+                    </div>
+                    <button id="analyze-btn" class="cyber-btn">ANALYZE</button>
+                </div>
+
+                <!-- Analyzing State -->
+                <div id="analyzing-state" class="state-container hidden">
+                    <div class="spinner-container">
+                        <div class="cyber-spinner"></div>
+                        <div class="spinner-text">DECRYPTING METADATA...</div>
+                    </div>
+                    <div class="log-output" id="analyze-log"></div>
+                </div>
+
+                <!-- Results State -->
+                <div id="results-state" class="state-container hidden">
+                    <div class="media-preview">
+                        <div class="thumbnail-container">
+                            <div class="thumb-overlay"></div>
+                            <img src="https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?q=80&w=1000&auto=format&fit=crop" alt="Media Thumbnail" id="media-thumb">
+                        </div>
+                        <div class="media-info">
+                            <h3 id="media-title">Target_Media_Alpha_01.mp4</h3>
+                            <div class="meta-grid">
+                                <div class="meta-item"><span class="meta-label">SOURCE:</span> <span id="media-source" class="meta-value highlight">YouTube</span></div>
+                                <div class="meta-item"><span class="meta-label">DURATION:</span> <span id="media-duration" class="meta-value">04:20:00</span></div>
+                                <div class="meta-item"><span class="meta-label">ENCRYPTION:</span> <span class="meta-value success">CLEARED</span></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="action-buttons">
+                        <button class="cyber-btn action-btn" data-type="video">
+                            <span class="btn-icon">🎥</span> EXTRACT VIDEO
+                        </button>
+                        <button class="cyber-btn action-btn" data-type="audio">
+                            <span class="btn-icon">🎵</span> EXTRACT AUDIO
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Processing State -->
+                <div id="processing-state" class="state-container hidden">
+                    <div class="progress-container">
+                        <div class="progress-bar-bg">
+                            <div class="progress-bar-fill" id="extraction-progress"></div>
+                        </div>
+                        <div class="progress-stats">
+                            <span id="progress-percent">0%</span>
+                            <span id="progress-speed">0 MiB/s</span>
+                            <span id="progress-eta">ETA: --:--</span>
+                        </div>
+                    </div>
+                    <div class="log-output" id="process-log"></div>
+                </div>
+
+                <!-- Completed State -->
+                <div id="completed-state" class="state-container hidden">
+                    <div class="success-message">
+                        <div class="success-icon">✓</div>
+                        <h3>EXTRACTION SUCCESSFUL</h3>
+                        <p>Payload secured in local storage.</p>
+                    </div>
+                    <button id="reset-btn" class="cyber-btn secondary">INITIALIZE NEW TARGET</button>
+                </div>
+            </div>
+        </section>
+
+        <!-- Architecture Section -->
+        <section id="architecture" class="glass-panel">
+             <header class="section-header">
+                <h2>SYSTEM ARCHITECTURE</h2>
+                <div class="status-indicator">
+                    <span class="pulse"></span> SCHEMATICS LOADED
+                </div>
+            </header>
+
+            <div class="architecture-content">
+                <div class="flow-diagram">
+                    <div class="flow-node user-node">USER</div>
+                    <div class="flow-arrow">↓</div>
+                    <div class="flow-node app-node">PYTHON APPLICATION</div>
+                    <div class="flow-arrow">↓</div>
+                    <div class="flow-node engine-node">YT-DLP ENGINE</div>
+                    <div class="flow-arrow">↓</div>
+                    <div class="flow-node process-node">FFMPEG MEDIA PROCESSING</div>
+                    <div class="flow-arrow">↓</div>
+                    <div class="flow-node output-node">DOWNLOAD OUTPUT</div>
+                </div>
+
+                <div class="tech-stack">
+                    <div class="stack-col">
+                        <h3>ORIGINAL CORE</h3>
+                        <ul>
+                            <li>Python</li>
+                            <li>yt-dlp</li>
+                            <li>FFmpeg</li>
+                        </ul>
+                    </div>
+                    <div class="stack-col">
+                        <h3>PORTFOLIO OS SHOWCASE</h3>
+                        <ul>
+                            <li>HTML5</li>
+                            <li>CSS3 (Glassmorphism)</li>
+                            <li>Vanilla JavaScript</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Story Section -->
+        <section id="story" class="glass-panel">
+            <header class="section-header">
+                <h2>PROJECT ORIGIN</h2>
+                <div class="status-indicator">
+                    <span class="pulse"></span> ARCHIVE ACCESSED
+                </div>
+            </header>
+            
+            <div class="story-content">
+                <p class="lead-text">This project began as a lightweight Python utility built to simplify media downloads.</p>
+                
+                <p>The original version focused purely on functionality and automation using the powerful <span class="highlight">yt-dlp</span> engine. The interface was intentionally minimal: simply paste a URL, choose video or audio, and the system would handle the rest.</p>
+                
+                <p>This web experience reimagines that original utility as a futuristic media intelligence platform while preserving the exact same underlying workflow. It serves as a bridge between purely functional backend code and premium frontend engineering.</p>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Legacy Terminal Overlay -->
+    <div id="legacy-terminal" class="terminal-overlay hidden">
+        <div class="terminal-window">
+            <div class="terminal-header">
+                <span>cmd.exe - downloader.py</span>
+                <button id="close-terminal">X</button>
+            </div>
+            <div class="terminal-body" id="term-body">
+                <div class="term-line">====================================</div>
+                <div class="term-line">ANY VIDEO DOWNLOADER</div>
+                <div class="term-line">====================================</div>
+                <br>
+                <div class="term-line">Paste URL:</div>
+                <div class="term-input-line">
+                    <span class="prompt">> </span><input type="text" id="term-input" class="term-input" autocomplete="off">
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
