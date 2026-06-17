@@ -24,7 +24,6 @@ def analyze():
     ydl_opts = {
         'skip_download': True,
         'quiet': True,
-        'extractor_args': {'youtube': ['player_client=ios']},
         'js_runtimes': { 'node': {} },
         'remote_components': ['ejs:github']
     }
@@ -94,7 +93,6 @@ def download():
             'outtmpl': f'{download_folder}/%(title)s.%(ext)s',
             'logger': QueueLogger(),
             'progress_hooks': [hook],
-            'extractor_args': {'youtube': ['player_client=ios']},
             'js_runtimes': { 'node': {} },
             'remote_components': ['ejs:github'],
             'quiet': False
