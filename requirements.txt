@@ -1,2 +1,2 @@
 Flask
-yt-dlp
+requests

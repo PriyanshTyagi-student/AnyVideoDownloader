@@ -150,11 +150,10 @@ document.addEventListener('DOMContentLoaded', () => {
                                     barFill.style.width = `100%`;
                                     percentText.innerText = `100%`;
                                     
-                                    if (msg.filename) {
-                                        const dlUrl = `/api/serve_file/${msg.dl_type}/${encodeURIComponent(msg.filename)}`;
+                                    if (msg.downloadUrl) {
                                         const a = document.createElement('a');
-                                        a.href = dlUrl;
-                                        a.download = msg.filename;
+                                        a.href = msg.downloadUrl;
+                                        a.target = '_blank';
                                         document.body.appendChild(a);
                                         a.click();
                                         document.body.removeChild(a);
@@ -262,11 +261,10 @@ document.addEventListener('DOMContentLoaded', () => {
                                     termStep = 0;
                                     termBody.scrollTop = termBody.scrollHeight;
 
-                                    if (msg.filename) {
-                                        const dlUrl = `/api/serve_file/${msg.dl_type}/${encodeURIComponent(msg.filename)}`;
+                                    if (msg.downloadUrl) {
                                         const a = document.createElement('a');
-                                        a.href = dlUrl;
-                                        a.download = msg.filename;
+                                        a.href = msg.downloadUrl;
+                                        a.target = '_blank';
                                         document.body.appendChild(a);
                                         a.click();
                                         document.body.removeChild(a);
