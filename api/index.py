@@ -1,12 +1,18 @@
 import os
 import json
-import requests
+import yt_dlp
 import queue
 import threading
-import time
-from flask import Flask, request, jsonify, Response, send_from_directory
+from flask import Flask, request, jsonify, Response, send_file
 
 app = Flask(__name__)
+
+@app.route('/api/serve_file/<dl_type>/<filename>')
+def serve_file(dl_type, filename):
+    filepath = os.path.join("/tmp", filename)
+    if os.path.exists(filepath):
+        return send_file(filepath, as_attachment=True)
+    return "File not found", 404
 
 @app.route('/api/analyze', methods=['POST'])
 def analyze():
@@ -15,29 +21,35 @@ def analyze():
     if not url:
         return jsonify({"error": "No URL provided"}), 400
 
-    title = "Target Media Acquired"
-    thumbnail = "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?q=80&w=1000&auto=format&fit=crop"
-    duration = "Unknown"
-    source = "External Platform"
+    ydl_opts = {
+        'skip_download': True,
+        'quiet': True,
+        'cookiesfrombrowser': ('chrome',),
+        'js_runtimes': { 'node': {} },
+        'remote_components': ['ejs:github']
+    }
+    
+    try:
+        with yt_dlp.YoutubeDL(ydl_opts) as ydl:
+            info = ydl.extract_info(url, download=False)
+            
+            # Format duration safely
+            duration = info.get('duration')
+            if duration:
+                mins, secs = divmod(duration, 60)
+                hours, mins = divmod(mins, 60)
+                duration_str = f"{hours:02d}:{mins:02d}:{secs:02d}" if hours else f"{mins:02d}:{secs:02d}"
+            else:
+                duration_str = "Unknown"
 
-    if 'youtube.com' in url or 'youtu.be' in url:
-        try:
-            oembed_url = f"https://www.youtube.com/oembed?url={url}&format=json"
-            res = requests.get(oembed_url, timeout=5)
-            if res.status_code == 200:
-                meta = res.json()
-                title = meta.get('title', title)
-                thumbnail = meta.get('thumbnail_url', thumbnail)
-                source = "YouTube"
-        except Exception:
-            pass
-
-    return jsonify({
-        "title": title,
-        "thumbnail": thumbnail,
-        "duration": duration,
-        "source": source
-    })
+            return jsonify({
+                "title": info.get('title', 'Unknown Title'),
+                "thumbnail": info.get('thumbnail', 'https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?q=80&w=1000&auto=format&fit=crop'),
+                "duration": duration_str,
+                "source": info.get('extractor', 'Unknown').capitalize()
+            })
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
 
 @app.route('/api/download', methods=['POST'])
 def download():
@@ -48,45 +60,75 @@ def download():
     if not url:
         return jsonify({"error": "No URL provided"}), 400
 
+    download_folder = "/tmp"
+    os.makedirs(download_folder, exist_ok=True)
+
     def generate():
         q = queue.Queue()
         
+        def hook(d):
+            if d['status'] == 'downloading':
+                progress = d.get('_percent_str', '0%').strip().replace('%', '')
+                # Handle ANSI escape codes that yt-dlp might output
+                import re
+                progress = re.sub(r'\x1b\[[0-9;]*m', '', progress)
+                speed = d.get('_speed_str', '0 MiB/s').strip()
+                speed = re.sub(r'\x1b\[[0-9;]*m', '', speed)
+                eta = d.get('_eta_str', '00:00').strip()
+                eta = re.sub(r'\x1b\[[0-9;]*m', '', eta)
+                q.put({'type': 'progress', 'progress': progress, 'speed': speed, 'eta': eta})
+            elif d['status'] == 'finished':
+                q.put({'type': 'log', 'message': '[ffmpeg] Processing and merging formats...'})
+
+        class QueueLogger:
+            def debug(self, msg): pass
+            def info(self, msg): 
+                q.put({'type': 'log', 'message': msg})
+            def warning(self, msg): 
+                q.put({'type': 'log', 'message': msg})
+            def error(self, msg): 
+                q.put({'type': 'log', 'message': f"ERROR: {msg}"})
+
+        # Configure yt-dlp opts based on type
+        ydl_opts = {
+            'outtmpl': f'{download_folder}/%(title)s.%(ext)s',
+            'logger': QueueLogger(),
+            'progress_hooks': [hook],
+            'cookiesfrombrowser': ('chrome',),
+            'js_runtimes': { 'node': {} },
+            'remote_components': ['ejs:github'],
+            'quiet': False
+        }
+
+        if dl_type == 'audio':
+            ydl_opts.update({
+                'format': 'bestaudio/best',
+                'postprocessors': [{
+                    'key': 'FFmpegExtractAudio',
+                    'preferredcodec': 'mp3',
+                    'preferredquality': '192',
+                }],
+            })
+        else:
+            ydl_opts.update({
+                'format': 'bestvideo+bestaudio/best',
+                'merge_output_format': 'mp4',
+            })
+
         def run_dl():
             try:
-                q.put({'type': 'log', 'message': '[api] Initializing Remote Extraction Engine...'})
-                time.sleep(0.5)
-                q.put({'type': 'progress', 'progress': '25', 'speed': 'High', 'eta': '00:02'})
-                q.put({'type': 'log', 'message': '[api] Bypassing restrictions via Cobalt Network...'})
-                
-                headers = {
-                    'Accept': 'application/json',
-                    'Content-Type': 'application/json',
-                    'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36'
-                }
-                payload = {
-                    "url": url,
-                    "isAudioOnly": (dl_type == 'audio')
-                }
-                
-                time.sleep(0.5)
-                q.put({'type': 'progress', 'progress': '60', 'speed': 'High', 'eta': '00:01'})
-                
-                response = requests.post('https://api.cobalt.tools/api/json', headers=headers, json=payload, timeout=20)
-                
-                q.put({'type': 'progress', 'progress': '95', 'speed': 'High', 'eta': '00:00'})
-                
-                if response.status_code == 200:
-                    resp_data = response.json()
-                    if resp_data.get('status') == 'error':
-                        q.put({'type': 'error', 'message': resp_data.get('text', 'Remote API Error')})
-                    else:
-                        download_url = resp_data.get('url')
-                        if download_url:
-                            q.put({'type': 'done', 'downloadUrl': download_url})
-                        else:
-                            q.put({'type': 'error', 'message': 'No download URL returned.'})
-                else:
-                    q.put({'type': 'error', 'message': f'Extraction failed (Code {response.status_code})'})
+                with yt_dlp.YoutubeDL(ydl_opts) as ydl:
+                    info = ydl.extract_info(url, download=True)
+                    filepath = ydl.prepare_filename(info)
+                    
+                    if dl_type == 'audio':
+                        filepath = os.path.splitext(filepath)[0] + '.mp3'
+                    elif dl_type == 'video':
+                        filepath = os.path.splitext(filepath)[0] + '.mp4'
+                        
+                    filename = os.path.basename(filepath)
+                    
+                q.put({'type': 'done', 'filename': filename, 'dl_type': dl_type})
             except Exception as e:
                 q.put({'type': 'error', 'message': str(e)})
 
@@ -102,6 +144,4 @@ def download():
     return Response(generate(), mimetype='text/event-stream')
 
 if __name__ == '__main__':
-    print("Starting Media Intelligence Server...")
-    print("Access via browser at http://localhost:5000")
-    app.run(host='0.0.0.0', port=5000, debug=False, threaded=True)
+    app.run(host='0.0.0.0', port=5000)
