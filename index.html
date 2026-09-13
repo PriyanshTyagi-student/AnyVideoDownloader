@@ -1,13 +1,18 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Media Intelligence Extraction System | Portfolio OS</title>
-    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>⚡</text></svg>">
+    <title>Media Intelligence Extraction System</title>
+    <link rel="icon"
+        href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>⚡</text></svg>">
     <link rel="stylesheet" href="style.css">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&family=JetBrains+Mono:wght@400;700&display=swap"
+        rel="stylesheet">
 </head>
+
 <body>
     <div id="ambient-bg">
         <div class="aurora aurora-1"></div>
@@ -37,15 +42,27 @@
                     <span class="pulse"></span> SYSTEM NOMINAL
                 </div>
             </header>
-            
+
             <div class="dashboard-grid">
                 <!-- System Health -->
                 <div class="hud-box">
                     <h3>System Health</h3>
                     <div class="health-stats">
-                        <div class="stat-row"><span>CPU</span> <div class="bar-bg"><div class="bar-fill" style="width: 34%"></div></div></div>
-                        <div class="stat-row"><span>MEM</span> <div class="bar-bg"><div class="bar-fill" style="width: 62%"></div></div></div>
-                        <div class="stat-row"><span>NET</span> <div class="bar-bg"><div class="bar-fill" style="width: 89%"></div></div></div>
+                        <div class="stat-row"><span>CPU</span>
+                            <div class="bar-bg">
+                                <div class="bar-fill" style="width: 34%"></div>
+                            </div>
+                        </div>
+                        <div class="stat-row"><span>MEM</span>
+                            <div class="bar-bg">
+                                <div class="bar-fill" style="width: 62%"></div>
+                            </div>
+                        </div>
+                        <div class="stat-row"><span>NET</span>
+                            <div class="bar-bg">
+                                <div class="bar-fill" style="width: 89%"></div>
+                            </div>
+                        </div>
                     </div>
                 </div>
 
@@ -53,9 +70,12 @@
                 <div class="hud-box">
                     <h3>Extraction Engine</h3>
                     <div class="engine-status">
-                        <div class="status-item"><span class="label">yt-dlp Core</span> <span class="value success">ONLINE</span></div>
-                        <div class="status-item"><span class="label">FFmpeg Processor</span> <span class="value success">ACTIVE</span></div>
-                        <div class="status-item"><span class="label">Bypass Modules</span> <span class="value warning">STANDBY</span></div>
+                        <div class="status-item"><span class="label">yt-dlp Core</span> <span
+                                class="value success">ONLINE</span></div>
+                        <div class="status-item"><span class="label">FFmpeg Processor</span> <span
+                                class="value success">ACTIVE</span></div>
+                        <div class="status-item"><span class="label">Bypass Modules</span> <span
+                                class="value warning">STANDBY</span></div>
                     </div>
                 </div>
 
@@ -124,9 +144,10 @@
                     </div>
                     <button id="analyze-btn" class="cyber-btn">ANALYZE</button>
                 </div>
-                <div style="color: #ff4a4a; font-size: 0.85rem; text-align: center; margin-top: 15px; letter-spacing: 1px; font-weight: 600; text-shadow: 0 0 10px rgba(255, 74, 74, 0.5);">
-                    ⚠️ YOUTUBE DOWNLOADS DISABLED DUE TO GOOGLE DATACENTER RESTRICTIONS.<br>
-                    <span style="color: #a0aabf; font-weight: 400; font-size: 0.75rem;">PLEASE EXTRACT MEDIA FROM TIKTOK, X (TWITTER), VIMEO, OR INSTAGRAM.</span>
+                <div
+                    style="color: #38bdf8; font-size: 0.85rem; text-align: center; margin-top: 15px; letter-spacing: 1px; font-weight: 600; text-shadow: 0 0 10px rgba(56, 189, 248, 0.4);">
+                    ⚡ AUTHENTICATED YOUTUBE &amp; MULTI-PLATFORM ENGINE ACTIVE<br>
+                    <span style="color: #94a3b8; font-weight: 400; font-size: 0.75rem;">YOUTUBE • TIKTOK • X (TWITTER) • VIMEO • INSTAGRAM</span>
                 </div>
 
                 <!-- Analyzing State -->
@@ -143,14 +164,18 @@
                     <div class="media-preview">
                         <div class="thumbnail-container">
                             <div class="thumb-overlay"></div>
-                            <img src="https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?q=80&w=1000&auto=format&fit=crop" alt="Media Thumbnail" id="media-thumb">
+                            <img src="https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?q=80&w=1000&auto=format&fit=crop"
+                                alt="Media Thumbnail" id="media-thumb">
                         </div>
                         <div class="media-info">
                             <h3 id="media-title">Target_Media_Alpha_01.mp4</h3>
                             <div class="meta-grid">
-                                <div class="meta-item"><span class="meta-label">SOURCE:</span> <span id="media-source" class="meta-value highlight">YouTube</span></div>
-                                <div class="meta-item"><span class="meta-label">DURATION:</span> <span id="media-duration" class="meta-value">04:20:00</span></div>
-                                <div class="meta-item"><span class="meta-label">ENCRYPTION:</span> <span class="meta-value success">CLEARED</span></div>
+                                <div class="meta-item"><span class="meta-label">SOURCE:</span> <span id="media-source"
+                                        class="meta-value highlight">YouTube</span></div>
+                                <div class="meta-item"><span class="meta-label">DURATION:</span> <span
+                                        id="media-duration" class="meta-value">04:20:00</span></div>
+                                <div class="meta-item"><span class="meta-label">ENCRYPTION:</span> <span
+                                        class="meta-value success">CLEARED</span></div>
                             </div>
                         </div>
                     </div>
@@ -194,7 +219,7 @@
 
         <!-- Architecture Section -->
         <section id="architecture" class="glass-panel">
-             <header class="section-header">
+            <header class="section-header">
                 <h2>SYSTEM ARCHITECTURE</h2>
                 <div class="status-indicator">
                     <span class="pulse"></span> SCHEMATICS LOADED
@@ -243,13 +268,18 @@
                     <span class="pulse"></span> ARCHIVE ACCESSED
                 </div>
             </header>
-            
+
             <div class="story-content">
-                <p class="lead-text">This project began as a lightweight Python utility built to simplify media downloads.</p>
-                
-                <p>The original version focused purely on functionality and automation using the powerful <span class="highlight">yt-dlp</span> engine. The interface was intentionally minimal: simply paste a URL, choose video or audio, and the system would handle the rest.</p>
-                
-                <p>This web experience reimagines that original utility as a futuristic media intelligence platform while preserving the exact same underlying workflow. It serves as a bridge between purely functional backend code and premium frontend engineering.</p>
+                <p class="lead-text">This project began as a lightweight Python utility built to simplify media
+                    downloads.</p>
+
+                <p>The original version focused purely on functionality and automation using the powerful <span
+                        class="highlight">yt-dlp</span> engine. The interface was intentionally minimal: simply paste a
+                    URL, choose video or audio, and the system would handle the rest.</p>
+
+                <p>This web experience reimagines that original utility as a futuristic media intelligence platform
+                    while preserving the exact same underlying workflow. It serves as a bridge between purely functional
+                    backend code and premium frontend engineering.</p>
             </div>
         </section>
 
@@ -270,7 +300,8 @@
                 <br>
                 <div class="term-line">Paste URL:</div>
                 <div class="term-input-line">
-                    <span class="prompt">> </span><input type="text" id="term-input" class="term-input" autocomplete="off">
+                    <span class="prompt">> </span><input type="text" id="term-input" class="term-input"
+                        autocomplete="off">
                 </div>
             </div>
         </div>
@@ -278,4 +309,5 @@
 
     <script src="script.js"></script>
 </body>
+
 </html>

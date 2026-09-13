@@ -1,0 +1,56 @@
+# Environment & Secrets
+.env
+.env.*
+!.env.example
+*.cookies
+*.txt
+cookies*
+*cookie*
+*.pem
+*.key
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+env/
+venv/
+.venv/
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+
+# Temporary files & downloads
+Downloads/
+temp/
+tmp/
+*.mp4
+*.mp3
+*.m4a
+*.webm
+*.part
+*.ytdl
+
+# Logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+
+# System & IDE
+.DS_Store
+.vscode/
+.idea/
