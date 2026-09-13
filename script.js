@@ -13,6 +13,13 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     });
 
+    // Determine backend API Base URL:
+    // If frontend is running on a static dev server (such as Live Server on port 5500, or file:),
+    // redirect API requests to the Python Flask backend on port 5000.
+    // When served directly via Flask (port 5000) or deployed to Vercel/production, use relative path ('').
+    const isStaticDevServer = (['5500', '5501', '3000', '8080'].includes(window.location.port) || window.location.protocol === 'file:');
+    const API_BASE = isStaticDevServer ? 'http://127.0.0.1:5000' : '';
+
     // Extractor Logic
     const analyzeBtn = document.getElementById('analyze-btn');
     const urlInput = document.getElementById('url-input');
@@ -56,39 +63,55 @@ document.addEventListener('DOMContentLoaded', () => {
         addLog(analyzeLog, `FETCHING REALTIME METADATA via yt-dlp...`);
         
         try {
-            const response = await fetch('/api/analyze', {
+            const response = await fetch(`${API_BASE}/api/analyze`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ url: url })
             });
 
-            const data = await response.json();
-            
-            if (response.ok) {
-                addLog(analyzeLog, `METADATA ACQUIRED SUCCESSFULLY.`);
-                document.getElementById('media-title').innerText = data.title;
-                document.getElementById('media-thumb').src = data.thumbnail;
-                document.getElementById('media-duration').innerText = data.duration;
-                document.getElementById('media-source').innerText = data.source;
-
-                setTimeout(() => {
-                    analyzingState.classList.add('hidden');
-                    resultsState.classList.remove('hidden');
-                }, 1000);
-            } else {
-                addLog(analyzeLog, `ERROR: ${data.error}`);
+            if (!response.ok) {
+                let errorMsg = `Server returned status ${response.status}`;
+                try {
+                    const errorJson = await response.json();
+                    if (errorJson && errorJson.error) errorMsg = errorJson.error;
+                } catch (e) {
+                    if (response.status === 405) {
+                        errorMsg = "Method Not Allowed (405). Please start the backend with: python api/index.py";
+                    }
+                }
+                addLog(analyzeLog, `ERROR: ${errorMsg}`);
                 setTimeout(() => {
                     analyzingState.classList.add('hidden');
                     inputGroup.classList.remove('hidden');
-                }, 3000);
+                }, 4000);
+                return;
             }
 
+            const data = await response.json();
+            
+            addLog(analyzeLog, `METADATA ACQUIRED SUCCESSFULLY.`);
+            document.getElementById('media-title').innerText = data.title;
+            document.getElementById('media-thumb').src = data.thumbnail;
+            document.getElementById('media-duration').innerText = data.duration;
+            document.getElementById('media-source').innerText = data.source;
+
+            setTimeout(() => {
+                analyzingState.classList.add('hidden');
+                resultsState.classList.remove('hidden');
+            }, 1000);
+
         } catch (err) {
-            addLog(analyzeLog, `NETWORK ERROR: ${err.message}`);
+            const isConnectionError = err.message.includes('Failed to fetch') || err.message.includes('NetworkError');
+            if (isConnectionError) {
+                addLog(analyzeLog, `BACKEND OFFLINE: Python server unreachable at ${API_BASE || window.location.origin}.`);
+                addLog(analyzeLog, `Please start the backend server: python api/index.py`);
+            } else {
+                addLog(analyzeLog, `NETWORK ERROR: ${err.message}`);
+            }
             setTimeout(() => {
                 analyzingState.classList.add('hidden');
                 inputGroup.classList.remove('hidden');
-            }, 3000);
+            }, 4000);
         }
     });
 
@@ -109,11 +132,16 @@ document.addEventListener('DOMContentLoaded', () => {
             addLog(processLog, `SPAWNING YT-DLP SUBPROCESS...`);
 
             try {
-                const response = await fetch('/api/download', {
+                const response = await fetch(`${API_BASE}/api/download`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ url: currentUrl, type: type })
                 });
+
+                if (!response.ok) {
+                    addLog(processLog, `ERROR: Server returned status ${response.status}`);
+                    return;
+                }
 
                 const reader = response.body.getReader();
                 const decoder = new TextDecoder("utf-8");
@@ -151,7 +179,7 @@ document.addEventListener('DOMContentLoaded', () => {
                                     percentText.innerText = `100%`;
                                     
                                     if (msg.filename) {
-                                        const dlUrl = `/api/serve_file/${msg.dl_type}/${encodeURIComponent(msg.filename)}`;
+                                        const dlUrl = `${API_BASE}/api/serve_file/${msg.dl_type}/${encodeURIComponent(msg.filename)}`;
                                         const a = document.createElement('a');
                                         a.href = dlUrl;
                                         a.download = msg.filename;
@@ -172,7 +200,13 @@ document.addEventListener('DOMContentLoaded', () => {
                     }
                 }
             } catch (err) {
-                addLog(processLog, `NETWORK ERROR: ${err.message}`);
+                const isConnectionError = err.message.includes('Failed to fetch') || err.message.includes('NetworkError');
+                if (isConnectionError) {
+                    addLog(processLog, `BACKEND OFFLINE: Python server unreachable.`);
+                    addLog(processLog, `Run: python api/index.py`);
+                } else {
+                    addLog(processLog, `NETWORK ERROR: ${err.message}`);
+                }
             }
         });
     });
@@ -228,12 +262,16 @@ document.addEventListener('DOMContentLoaded', () => {
                 termInput.disabled = true;
 
                 try {
-                    const response = await fetch('/api/download', {
+                    const response = await fetch(`${API_BASE}/api/download`, {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },
                         body: JSON.stringify({ url: legacyUrl, type: type })
                     });
                     
+                    if (!response.ok) {
+                        throw new Error(`Server status ${response.status}`);
+                    }
+
                     const reader = response.body.getReader();
                     const decoder = new TextDecoder("utf-8");
                     let buffer = "";
@@ -263,7 +301,7 @@ document.addEventListener('DOMContentLoaded', () => {
                                     termBody.scrollTop = termBody.scrollHeight;
 
                                     if (msg.filename) {
-                                        const dlUrl = `/api/serve_file/${msg.dl_type}/${encodeURIComponent(msg.filename)}`;
+                                        const dlUrl = `${API_BASE}/api/serve_file/${msg.dl_type}/${encodeURIComponent(msg.filename)}`;
                                         const a = document.createElement('a');
                                         a.href = dlUrl;
                                         a.download = msg.filename;
@@ -284,8 +322,12 @@ document.addEventListener('DOMContentLoaded', () => {
                         }
                     }
                 } catch (err) {
+                    const isConnectionError = err.message.includes('Failed to fetch') || err.message.includes('NetworkError');
+                    const msg = isConnectionError 
+                        ? "Backend offline. Please run 'python api/index.py'." 
+                        : err.message;
                     const errDiv = document.createElement('div');
-                    errDiv.innerHTML = `<br>Error: ${err.message}<br><br>Paste URL: `;
+                    errDiv.innerHTML = `<br>Error: ${msg}<br><br>Paste URL: `;
                     termBody.insertBefore(errDiv, termInput.parentElement);
                     termInput.disabled = false;
                     termInput.focus();
